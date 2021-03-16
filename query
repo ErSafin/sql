@@ -1,0 +1,105 @@
+CREATE DATABASE MyBase; — Создание общей БД
+
+— Создание таблицы БД
+CREATE TABLE persons (
+id INT NOT NULL AUTO_INCREMENT,
+name VARCHAR (30),
+birth DATE,
+bio TEXT,
+email VARCHAR (40),
+PRIMARY KEY (id)
+);
+
+— заполнение значений в поля
+INSERT INTO persons (name, email, birth, bio)
+VALUES ('Bob' , 'bob@tt.com' , '2012-02-02','ProgR'),
+('John', 'John@tt.com', '2010-01-09','Consult'),
+('Pete', 'Pete@tt.com', '2009-11-08','IT-manager'),
+('Bill', 'Bill@tt.com', '2001-02-11','IT-manager');
+--заполнение некоторых полей, но без ограничения для обязательного заполнения (NOT NULL)
+INSERT INTO person (name, email, birth) VALUES ('Sam', 'Sam@tt.ee', 2000-01-01);
+
+— Создание таблицы товаров
+CREATE TABLE shop (
+id INT NOT NULL AUTO_INCREMENT,
+title VARCHAR(100),
+price INT,
+PRIMARY KEY (id)
+);
+
+— заполнение таблицы товара в магазине
+INSERT INTO shop (title,price)
+VALUES
+('Smart iPhone 10', 800),
+('TV 43LP100', 600),
+('GameConsole PS4', 450),
+('Notebook MacBook 13', 1200),
+('Fridge NordFrost', 2000),
+('iPhone XR', 530);
+
+— создание таблицы текущих продаж
+CREATE TABLE invoce (
+id INT NOT NULL AUTO_INCREMENT,
+orderNum INT,
+shopID INT,
+personID INT,
+date_Time DATETIME DEFAULT CURRENT_TIMESTAMP,
+PRIMARY KEY (id),
+FOREIGN KEY (shopID) REFERENCES shop(id),
+FOREIGN KEY (personID) REFERENCES person(id)
+);
+
+— заполнение таблицы продаж
+INSERT INTO orders (orderNum,shopID,personID)
+VALUES
+(0001,2,4),
+(0002,4,1),
+(0003,1,3),
+(0004,2,1),
+(0005,4,5),
+(0006,3,1),
+(0007,6,5),
+(0008,4,4),
+(0009,4,3),
+(0010,5,1);
+
+— выборка по всем продажам с персональными данными
+SELECT invoice.orderNum AS 'Номер', invoice.date_time AS 'Дата', person.name AS 'Имя',
+person.email AS 'Эл.почта', shop.title AS 'Наименование', shop.price AS 'Цена'
+FROM person
+INNER JOIN invoice ON person.id = invoice.personID
+INNER JOIN shop ON shop.id = invoice.shopID
+ORDER BY invoice.orderNum;
+
+— обязательное поле к заполнению NOT NULL
+ALTER TABLE person CHANGE birth birth DATE NOT NULL;
+INSERT INTO person (name, birth) VALUES ('Alex', 1998-09-12);
+
+— изменение данных в поле с id = 3
+UPDATE person SET name = 'Serg' WHERE id=3;
+
+— Удаление записи измененной записи
+DELETE FROM person WHERE id =3;
+
+— Создание индекса
+CREATE INDEX nIndex ON person (name);
+
+— ЗАПРОСЫ:
+SELECT * FROM person; — выбрать все данные из таблицы person
+SELECT name, bio FROM `person`; — выбрать колонки name, bio из таблицы person
+SELECT id, name FROM `person` WHERE id > 1 AND id < 4; — выбрать колонки id, name из таблицы person где id > 1 AND id < 4
+SELECT * FROM `person` WHERE id <> 5; — все записи , кроме id не равно 5
+SELECT * FROM `person` WHERE id <> 5 AND id <> 2; — все записи , кроме id не равно 5 и 2
+SELECT * FROM `person` WHERE id <> 5 AND id <> 2 AND bio IS NULL; — все записи , кроме id не равно 5 и 2 и bio не пустая строка
+SELECT DISTINCT name FROM person; — элементы по полю name не должны повторяться
+SELECT * FROM 'person' LIMIT 2; — выбирает первые 2 элемента базы
+SELECT * FROM person WHERE name = 'Pete' ORDER BY id LIMIT 2; — Сортировка по полю id
+SELECT * FROM person WHERE name = 'Pete' ORDER BY id DESC LIMIT 2; — сортировка по убыванию
+SELECT * FROM person WHERE id BETWEEN 2 AND 6 AND id <> 4 ORDER BY id DESC; — диапазон id от 2 до 6, сортировка по полю id, по убыванию
+SELECT * FROM person WHERE id IN (4,1,5) ORDER BY id DESC; — выводятся записи где id = 4,1,5
+SELECT * FROM person WHERE name LIKE 'P%'; — выбираем все поля где name начинается с буквы P
+SELECT * FROM person WHERE name LIKE '%o%'; — выбираем все поля где name все поля включающие буквe 'o'
+
+SELECT price, COUNT(price) FROM shop GROUP BY price; — группировать по цене выбрав поля цена и количество полей с одинаковой ценой
+
+SELECT name, COUNT( name ) FROM person GROUP BY name HAVING COUNT(name) > 1 ; — группировка по имени, с количеством повторяющихся имен>1
